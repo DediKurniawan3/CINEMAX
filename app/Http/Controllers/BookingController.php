@@ -39,6 +39,58 @@ class BookingController extends Controller
         ));
     }
 
+    // HALAMAN PENCARIAN TIKET SAYA
+    public function myTicketForm()
+    {
+        return view('ticket-lookup');
+    }
+
+    // MENCARI TIKET BERDASARKAN KODE BOOKING DAN EMAIL
+    public function findMyTicket(Request $request)
+    {
+        $validated = $request->validate([
+            'booking_code' => 'required|string|max:20',
+            'customer_email' => 'required|email|max:150',
+        ]);
+
+        $booking = \App\Models\Booking::with([
+            'schedule.film',
+            'schedule.studio',
+            'bookingDetails.seat',
+            'payment',
+        ])
+            ->where('booking_code', strtoupper(trim($validated['booking_code'])))
+            ->whereRaw('LOWER(customer_email) = ?', [
+                strtolower(trim($validated['customer_email']))
+            ])
+            ->first();
+
+        if (!$booking) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'booking' => 'Pesanan tidak ditemukan. Periksa kembali kode booking dan email kamu.',
+                ]);
+        }
+
+        // E-ticket hanya dapat diakses setelah pembayaran diverifikasi
+        if (
+            $booking->status === 'confirmed' &&
+            $booking->payment?->status === 'verified'
+        ) {
+            return redirect()->route(
+                'booking.ticket',
+                $booking->booking_code
+            );
+        }
+
+        // Pesanan yang belum terverifikasi diarahkan ke halaman pembayaran
+        return redirect()->route(
+            'booking.payment',
+            $booking->booking_code
+        );
+    }
+
 
     // HALAMAN FORM DATA PEMESAN
     public function form(Request $request, $id)
@@ -195,7 +247,7 @@ class BookingController extends Controller
         return view('payment', [
             'booking' => $booking,
             'schedule' => $booking->schedule,
-            'details' => $booking->bookingDetails->map(fn ($detail) => (object) [
+            'details' => $booking->bookingDetails->map(fn($detail) => (object) [
                 'row' => $detail->seat->row,
                 'seat_number' => $detail->seat->seat_number,
                 'ticket_price' => $detail->ticket_price,
@@ -207,7 +259,10 @@ class BookingController extends Controller
     public function ticket($code)
     {
         $booking = \App\Models\Booking::with([
-            'schedule.film', 'schedule.studio', 'bookingDetails.seat', 'payment'
+            'schedule.film',
+            'schedule.studio',
+            'bookingDetails.seat',
+            'payment'
         ])->where('booking_code', $code)->firstOrFail();
 
         abort_unless($booking->status === 'confirmed' && $booking->payment?->status === 'verified', 403, 'E-ticket tersedia setelah pembayaran diverifikasi.');
@@ -229,5 +284,4 @@ class BookingController extends Controller
                 }
             });
     }
-
 }

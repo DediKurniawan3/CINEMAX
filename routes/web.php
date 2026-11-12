@@ -18,6 +18,15 @@ Route::get('/pemesanan/{code}/upload', [PaymentController::class, 'create'])->na
 Route::post('/pemesanan/{code}/upload', [PaymentController::class, 'store'])->name('payment.store');
 Route::get('/e-ticket/{code}', [BookingController::class, 'ticket'])->name('booking.ticket');
 
+// FITUR TIKET SAYA
+Route::get('/tiket-saya', [BookingController::class, 'myTicketForm'])
+    ->name('booking.my-ticket');
+
+Route::post('/tiket-saya/cari', [BookingController::class, 'findMyTicket'])
+    ->middleware('throttle:5,1')
+    ->name('booking.my-ticket.search');
+
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminController::class, 'loginForm'])->name('login');
     Route::post('/login', [AdminController::class, 'login'])->middleware('throttle:5,1')->name('login.submit');

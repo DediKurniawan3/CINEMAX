@@ -155,36 +155,41 @@ class DatabaseSeeder extends Seeder
 
         $showtimes = [11, 14, 17, 20];
 
-        foreach ($allFilms as $filmIndex => $film) {
+        $allFilms = Film::where('status', 'now_showing')->get();
 
-            // Membagi film ke dua studio
-            $studioIndex = $filmIndex % count($createdStudios);
+        $allStudios = Studio::all();
 
-            $studio = $createdStudios[$studioIndex];
+        // Membuat jadwal untuk 7 hari ke depan
+        for ($day = 1; $day <= 7; $day++) {
 
-            // Jadwal pukul 11.00, 14.00, 17.00, 20.00
-            $hour = $showtimes[intdiv($filmIndex, count($createdStudios))];
+            foreach ($allStudios as $studioIndex => $studio) {
 
-            $start = now()
-                ->addDay()
-                ->startOfDay()
-                ->addHours($hour);
+                foreach ($allFilms as $filmIndex => $film) {
 
-            $end = $start->copy()
-                ->addMinutes($film->duration + 15);
+                    $hour = 12 + ($filmIndex * 3) + $studioIndex;
 
-            Schedule::updateOrCreate(
-                [
-                    'film_id' => $film->id,
-                    'studio_id' => $studio->id,
-                    'start_time' => $start,
-                ],
-                [
-                    'end_time' => $end,
-                    'price' => $studioIndex === 0 ? 45000 : 60000,
-                    'status' => 'active',
-                ]
-            );
+                    $start = now()
+                        ->addDays($day)
+                        ->startOfDay()
+                        ->addHours($hour);
+
+                    $end = $start->copy()
+                        ->addMinutes($film->duration + 15);
+
+                    Schedule::firstOrCreate(
+                        [
+                            'film_id' => $film->id,
+                            'studio_id' => $studio->id,
+                            'start_time' => $start,
+                        ],
+                        [
+                            'end_time' => $end,
+                            'price' => $studioIndex === 0 ? 45000 : 60000,
+                            'status' => 'active',
+                        ]
+                    );
+                }
+            }
         }
     }
 }

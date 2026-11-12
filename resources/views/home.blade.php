@@ -320,6 +320,183 @@
             box-shadow: 0 5px 18px rgba(220, 38, 38, .3);
         }
 
+        /* =====================================
+        CINEMAX - MIDNIGHT NAVY HOME THEME
+        ===================================== */
+
+        /* BACKGROUND UTAMA */
+        body {
+            background: #0B1424;
+            color: #F4F7FC;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #101D30;
+            border-bottom: 1px solid #263B57;
+        }
+
+        .nav-links {
+            color: #B7C7DC;
+        }
+
+        .nav-links a:hover {
+            color: #4389D8;
+        }
+
+        /* TOMBOL NAVIGASI */
+        .nav-button,
+        .primary-button {
+            background: #ED1C24;
+            transition: all .3s ease;
+        }
+
+        .nav-button:hover,
+        .primary-button:hover {
+            background: #C81019;
+            transform: translateY(-2px);
+        }
+
+        /* ADMIN BUTTON */
+        .admin-nav-btn {
+            background: #245B9E;
+            border-color: #4389D8;
+        }
+
+        .admin-nav-btn:hover {
+            background: #326FB8;
+            box-shadow: 0 5px 18px rgba(36, 91, 158, .3);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background:
+                linear-gradient(
+                    90deg,
+                    #101D30 25%,
+                    rgba(16, 29, 48, .85) 65%,
+                    rgba(16, 29, 48, .4)
+                ),
+                linear-gradient(
+                    135deg,
+                    #245B9E,
+                    #101D30 65%,
+                    #172A43
+                );
+
+            border: 1px solid #304967;
+        }
+
+        /* HERO TEXT */
+        .hero p {
+            color: #B7C7DC;
+        }
+
+        /* SECTION HEADING */
+        .section-heading h2 {
+            color: #F4F7FC;
+        }
+
+        .section-heading p {
+            color: #9DB0C9;
+        }
+
+        /* MOVIE CARD */
+        .movie-card {
+            background: #14243A;
+            border: 1px solid #263B57;
+            transition: all .3s ease;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-7px);
+            border-color: #4389D8;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .25);
+        }
+
+        /* POSTER */
+        .poster {
+            background: linear-gradient(
+                145deg,
+                #245B9E,
+                #101D30
+            );
+        }
+
+        /* INFORMASI FILM */
+        .movie-info {
+            background: #14243A;
+        }
+
+        .movie-info p {
+            color: #A9BAD0;
+        }
+
+        /* RATING FILM */
+        .age {
+            border-color: #45617F;
+            color: #D8E5F5;
+        }
+
+        /* TOMBOL PILIH FILM */
+        .book-button {
+            background: #ED1C24;
+            transition: all .3s ease;
+        }
+
+        .book-button:hover {
+            background: #C81019;
+        }
+
+        /* EMPTY STATE */
+        .empty {
+            color: #B7C7DC;
+            border-color: #34506F;
+            background: #14243A;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #101D30;
+            border-top: 1px solid #263B57;
+            color: #9DB0C9;
+        }
+
+        footer strong {
+            color: #ED1C24;
+        }
+
+        /* RESPONSIVE CARD */
+        @media (max-width: 520px) {
+            .movie-card {
+                border-radius: 12px;
+            }
+
+            .hero {
+                border-radius: 14px;
+            }
+        }
+
+        .ticket-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #245B9E;
+            color: white;
+            border: 1px solid #4389D8;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: .3s ease;
+        }
+
+        .ticket-nav-btn:hover {
+            background: #326FB8;
+            transform: translateY(-2px);
+        }
+
     </style>
 </head>
 
@@ -353,6 +530,11 @@
         </div>
 
 
+
+        <a href="{{ route('booking.my-ticket') }}" class="ticket-nav-btn">
+            🎟 Tiket Saya
+        </a>
+
         <a href="{{ url('/admin/login') }}" class="admin-nav-btn">
             <span>♙</span> ADMIN
         </a>
@@ -371,15 +553,14 @@
             <div class="tag">WELCOME TO CINEMAX</div>
 
             <h1>
-                Experience<br>
-                The Magic of Movies.
+                Feel the Story<br>
+                Live the Moment.
             </h1>
 
             <p>
-                Nikmati pengalaman menonton film terbaik
-                dengan kualitas layar dan audio yang luar biasa.
-                Pesan tiket bioskop favoritmu dengan mudah
-                hanya melalui CINEMAX.
+                Jelajahi beragam film pilihan, temukan jadwal tayang favoritmu, 
+                dan nikmati pengalaman memesan tiket bioskop 
+                dengan mudah hanya bersama CINEMAX.
             </p>
 
             <a href="#now-showing" class="primary-button">

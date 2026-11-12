@@ -246,6 +246,180 @@
             font-weight: bold;
         }
 
+        /* FILTER TANGGAL */
+        .date-filter {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 10px 2px 18px;
+            margin: 20px 0;
+        }
+
+        .date-button {
+            min-width: 75px;
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: #17171f;
+            color: #aaa;
+            border: 1px solid #30303a;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .date-button strong {
+            font-size: 23px;
+            color: white;
+        }
+
+        .date-button span,
+        .date-button small {
+            font-size: 11px;
+        }
+
+        .date-button:hover,
+        .date-button.active {
+            background: #ed1726;
+            border-color: #ed1726;
+            color: white;
+        }
+
+        .date-button.active strong {
+            color: white;
+        }
+
+        /* SEMBUNYIKAN JADWAL TANGGAL LAIN */
+        .schedule-hidden {
+            display: none !important;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .schedule-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .schedule-card {
+                padding: 15px;
+            }
+        }
+
+
+        /* =================================
+        CINEMAX - MIDNIGHT NAVY THEME
+        ================================= */
+
+        body {
+            background: #0B1424;
+            color: #F4F7FC;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #101D30;
+            border-bottom: 1px solid #263B57;
+        }
+
+        .back {
+            color: #B7C7DC;
+        }
+
+        /* INFORMASI FILM */
+        .information h1 {
+            color: #F4F7FC;
+        }
+
+        .meta,
+        .synopsis {
+            color: #A9BAD0;
+        }
+
+        .age {
+            border-color: #45617F;
+            color: #D8E5F5;
+        }
+
+        /* POSTER */
+        .poster {
+            background: linear-gradient(145deg, #245B9E, #101D30);
+            border: 1px solid #34577F;
+        }
+
+        /* JADWAL TAYANG */
+        .schedule-section {
+            background: #101D30;
+            border: 1px solid #263B57;
+            border-radius: 18px;
+            padding: 28px;
+        }
+
+        .schedule-card {
+            background: #172A43;
+            border: 1px solid #304967;
+            transition: all .3s ease;
+        }
+
+        .schedule-card:hover {
+            border-color: #4389D8;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+        }
+
+        .schedule-card p {
+            color: #A9BAD0;
+        }
+
+        /* FILTER TANGGAL */
+        .date-button {
+            background: #172A43;
+            border-color: #304967;
+            color: #C3D2E5;
+        }
+
+        .date-button strong {
+            color: #FFFFFF;
+        }
+
+        .date-button:hover,
+        .date-button.active {
+            background: #245B9E;
+            border-color: #4389D8;
+            color: #FFFFFF;
+        }
+
+        /* HARGA */
+        .price {
+            color: #FF5964;
+        }
+
+        /* TOMBOL PILIH KURSI */
+        .time {
+            background: #ED1C24;
+            color: #FFFFFF;
+            transition: .3s ease;
+        }
+
+        .time:hover {
+            background: #C81019;
+        }
+
+        /* EMPTY STATE */
+        .empty {
+            background: #172A43;
+            color: #B7C7DC;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #101D30;
+            border-top: 1px solid #263B57;
+            color: #8FA5C0;
+        }
+
     </style>
 </head>
 
@@ -310,59 +484,103 @@
         </section>
 
 
+        
         <!-- JADWAL TAYANG -->
-
         <section class="schedule-section">
 
             <h2>Pilih <span>Jadwal Tayang</span></h2>
 
             <p class="subtitle">
-                Pilih studio dan jam tayang film favoritmu.
+                Pilih tanggal, studio, dan jam tayang film favoritmu.
             </p>
 
-            <div class="schedule-grid">
+            @php
+                $groupedSchedules = $schedules->groupBy(function ($schedule) {
+                    return \Carbon\Carbon::parse($schedule->start_time)->format('Y-m-d');
+                });
 
-                @forelse($schedules as $schedule)
+                $firstDate = $groupedSchedules->keys()->first();
+            @endphp
 
-                    <div class="schedule-card">
+            @if($groupedSchedules->isNotEmpty())
 
-                        <h3>{{ $schedule->studio->name }}</h3>
+                
+                    <!-- PILIH TANGGAL -->
+                    <div class="date-filter">
 
-                        <p>
-                            {{ $schedule->studio->studio_type }}
-                        </p>
+                        @foreach($groupedSchedules as $date => $dateSchedules)
 
-                        <p>
-                            {{ \Carbon\Carbon::parse($schedule->start_time)->format('d M Y') }}
-                        </p>
+                            <button
+                                type="button"
+                                class="date-button {{ $date === $firstDate ? 'active' : '' }}"
+                                data-date="{{ $date }}"
+                            >
+                                <span>
+                                    {{ \Carbon\Carbon::parse($date)->translatedFormat('D') }}
+                                </span>
 
-                        <p>
-                            {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}
-                            -
-                            {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
-                        </p>
+                                <strong>
+                                    {{ \Carbon\Carbon::parse($date)->format('d') }}
+                                </strong>
 
-                        <div class="price">
-                            Rp {{ number_format($schedule->price, 0, ',', '.') }}
+                                <small>
+                                    {{ \Carbon\Carbon::parse($date)->translatedFormat('M') }}
+                                </small>
+                            </button>
+
+                        @endforeach
+
+                    </div>
+
+
+                <!-- DAFTAR JADWAL -->
+                <div class="schedule-grid">
+
+                    @foreach($schedules as $schedule)
+
+                        @php
+                            $scheduleDate = \Carbon\Carbon::parse($schedule->start_time)->format('Y-m-d');
+                        @endphp
+
+                        <div
+                            class="schedule-card {{ $scheduleDate !== $firstDate ? 'schedule-hidden' : '' }}"
+                            data-date="{{ $scheduleDate }}"
+                        >
+
+                            <h3>{{ $schedule->studio->name }}</h3>
+
+                            <p>{{ $schedule->studio->studio_type }}</p>
+
+                            <p>
+                                {{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }}
+                                -
+                                {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}
+                            </p>
+
+                            <div class="price">
+                                Rp {{ number_format($schedule->price, 0, ',', '.') }}
+                            </div>
+
+                            <a href="{{ route('booking.seats', $schedule->id) }}" class="time">
+                                Pilih Kursi
+                            </a>
+
                         </div>
 
-                        <a href="{{ route('booking.seats', $schedule->id) }}" class="time">
-                            Pilih Kursi
-                        </a>
+                    @endforeach
 
-                    </div>
+                </div>
 
-                @empty
+            @else
 
-                    <div class="empty">
-                        Belum ada jadwal tayang tersedia untuk film ini.
-                    </div>
+                <div class="empty">
+                    Belum ada jadwal tayang tersedia untuk film ini.
+                </div>
 
-                @endforelse
-
-            </div>
+            @endif
 
         </section>
+
 
     </main>
 
@@ -371,5 +589,42 @@
         &copy; {{ date('Y') }} CINEMAX. All Rights Reserved.
     </footer>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const dateButtons = document.querySelectorAll('.date-button');
+        const scheduleCards = document.querySelectorAll('.schedule-card');
+
+        dateButtons.forEach(button => {
+
+            button.addEventListener('click', function () {
+
+                const selectedDate = this.dataset.date;
+
+                // Mengubah tanggal aktif
+                dateButtons.forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                this.classList.add('active');
+
+                // Menampilkan jadwal berdasarkan tanggal
+                scheduleCards.forEach(card => {
+
+                    if (card.dataset.date === selectedDate) {
+                        card.classList.remove('schedule-hidden');
+                    } else {
+                        card.classList.add('schedule-hidden');
+                    }
+
+                });
+
+            });
+
+        });
+
+    });
+    </script>
 </body>
 </html>
+
